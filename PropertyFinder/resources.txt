@@ -1,0 +1,2 @@
+https://github.com/facebook/react-native/issues/21310
+https://github.com/react-navigation/react-navigation/issues/666
