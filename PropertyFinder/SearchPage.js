@@ -38,7 +38,7 @@ export default class SearchPage extends Component<Props> {
                         title='Go'
                     />
                 </View>
-
+                <Image source={require('./Resources/house.png')} style={styles.image}></Image>
             </View>
         );
     }
@@ -62,14 +62,18 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
       },
       searchInput: {
-        height: 36,
-        padding: 4,
+        height: 40,
+        padding: 10,
         marginRight: 5,
-        flexGrow: 1,
+        flexGrow: 3,
         fontSize: 18,
         borderWidth: 1,
         borderColor: '#48BBEC',
         borderRadius: 8,
         color: '#48BBEC',
       },
+      image:{
+          height:138,
+          width: 217
+      }
 });
