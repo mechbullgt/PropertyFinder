@@ -13,12 +13,88 @@ import {
 
 type Props = {};
 
+function urlForQueryAndPage(key, value, pageNumber) {
+    const data = {
+        country: 'uk',
+        pretty: '1',
+        encoding: 'json',
+        listing_type: 'buy',
+        action: 'search_listings',
+        page: pageNumber,
+    };
+    data[key] = value;
+    
+    const querystring = Object.keys(data)
+        .map(key => key + '=' + encodeURIComponent(data[key]))
+        .join('&');
+    console.log("Function: QueryString:"+querystring);
+    return 'https://api.nestoria.co.uk/api?' + querystring;
+};
+
+// SearchPage Class 
 export default class SearchPage extends Component<Props> {
     static navigationOptions = {
         title: 'Property Finder',
     };
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            searchString: 'London',
+            isLoading: false,
+            message: '',
+        };
+    }
+
+    // Below is a Private method, indicated with a start using 'underscore'
+    _onSearchTextChanged = (event) => {
+        console.log('Private Method onSearchTextChanged is called');
+        this.setState({
+            searchString: event.nativeEvent.text
+        });
+        console.log('Current: ' + this.state.searchString + ', Next:' + event.nativeEvent.text);
+    };
+
+    // Private method to execute query
+    _executeQuery = (query) => {
+        console.log("Query: " + query);
+        this.setState({
+            isLoading: true
+        })
+        fetch(query)
+        .then(response=> response.json())
+        .then(json=> this._handleResponse(json.response))
+        .catch(error=>this.setState({
+            isLoading:false,
+            message:'Something Bad Happened while fetching data ERROR: '+error
+        }))
+    };
+
+    // Private method to handle API response
+    _handleResponse = (response) => {
+        this.setState({ isLoading: false , message: '' });
+        if (response.application_response_code.substr(0, 1) === '1') {
+            this.props.navigation.navigate (
+                'Results', {listings: response.listings}    
+            )
+          console.log('Properties found: ' + response.listings.length);
+        } else {
+          this.setState({ message: 'Location not recognized; please try again.'});
+        }
+      };
+
+    // Private method to be executed when the "Search" button is pressed.
+    _onSearchPressed = () => {
+        console.log("Seach Icon is pressed.");
+        const query = urlForQueryAndPage('place_name', this.state.searchString, 1);
+        this._executeQuery(query);
+    }
+
     render() {
+        console.log('SearchPage.render');
+
+        // Show a loading indicator if is loading is happening. 
+        const spinner = this.state.isLoading ? <ActivityIndicator size='large' /> : null;
         return (
             <View style={styles.container}>
                 <Text style={styles.description}>
@@ -31,14 +107,18 @@ export default class SearchPage extends Component<Props> {
                     <TextInput
                         underlineColorAndroid={'transparent'}
                         style={styles.searchInput}
+                        value={this.state.searchString}
+                        onChange={this._onSearchTextChanged}
                         placeholder='Search via name or postcode' />
                     <Button
-                        onPress={() => { }}
+                        onPress={this._onSearchPressed}
                         color='#48BBEC'
-                        title='Go'
+                        title='Search'
                     />
                 </View>
                 <Image source={require('./Resources/house.png')} style={styles.image}></Image>
+                {spinner}
+                <Text style={styles.description}>{this.state.message}</Text>
             </View>
         );
     }
@@ -60,8 +140,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'stretch',
-      },
-      searchInput: {
+    },
+    searchInput: {
         height: 40,
         padding: 10,
         marginRight: 5,
@@ -71,9 +151,9 @@ const styles = StyleSheet.create({
         borderColor: '#48BBEC',
         borderRadius: 8,
         color: '#48BBEC',
-      },
-      image:{
-          height:138,
-          width: 217
-      }
+    },
+    image: {
+        height: 138,
+        width: 217
+    }
 });
