@@ -14,6 +14,11 @@ import {
 // Toggle Switch
 import ToggleSwitch from 'toggle-switch-react-native';
 
+// Get Ip Address
+import PublicIp from 'react-native-public-ip';
+// Get Device Information
+import DeviceInfo from 'react-native-device-info';
+
 type Props = {};
 
 function urlForQueryAndPage(key, value, pageNumber) {
@@ -47,7 +52,7 @@ export default class SearchPage extends Component<Props> {
             isLoading: false,
             message: '',
             defaultSwitchOn: true,
-            swithIsOff: false
+            deviceToggleSwitch: false
         };
     }
 
@@ -96,26 +101,53 @@ export default class SearchPage extends Component<Props> {
     }
 
     // Private method to operate toggle
-    _toggleSwitchPressed () {
+    _toggleIpSwitch() {
         console.log("Toggle Switch Pressed");
+        PublicIp().then(ip => {
+            alert('Your IP Address : ' + ip);
+            console.log('Your Ip:' + ip);
+        }).catch(error => {
+            alert('Unable to Capture IP');
+            console.log('Unable to fetch your Ip');
+        })
+    }
+
+    _toggleDeviceInfoSwitch(){
+        console.log('Device Information Switch Pressed');    
+        // alert('Application Name:'+DeviceInfo.getBrand());
+        alert('Application Name:'+'Fetching...');
     }
 
     render() {
         console.log('SearchPage.render');
-        var myToggle = <ToggleSwitch
+        var ipToggleSwitch = <ToggleSwitch
             isOn={this.state.defaultSwitchOn}
             onColor='green'
-            offColor='blue'
-            label='Expert Mode'
+            offColor='red'
+            label='Show My IP'
             labelStyle={{ color: 'black', fontWeight: '900' }}
             size='small'
             onToggle={defaultSwitchOn => {
-                alert('Expert Mode 1: ' + this.state.defaultSwitchOn);
+                // alert('Expert Mode 1: ' + this.state.defaultSwitchOn);
                 this.setState({ defaultSwitchOn });
-                alert('Expert Mode 2: ' + this.state.defaultSwitchOn);
-                this._toggleSwitchPressed({ defaultSwitchOn });
+                // alert('Expert Mode 2: ' + this.state.defaultSwitchOn);
+                this._toggleIpSwitch({ defaultSwitchOn });
             }}
-        />;
+        />
+        var deviceInfoSwitch = <ToggleSwitch
+            isOn={this.state.deviceToggleSwitch}
+            onColor='green'
+            offColor='red'
+            label='Show Device Information'
+            labelStyle={{ color: 'black', fontWeight: '900' }}
+            size='small'
+            onToggle={deviceToggleSwitch => {
+                // alert('Expert Mode 1: ' + this.state.defaultSwitchOn);
+                this.setState({ deviceToggleSwitch });
+                // alert('Expert Mode 2: ' + this.state.defaultSwitchOn);
+                this._toggleDeviceInfoSwitch({ deviceToggleSwitch });
+            }}
+        />
 
 
         // Show a loading indicator if is loading is happening. 
@@ -123,8 +155,10 @@ export default class SearchPage extends Component<Props> {
         return (
             <View style={styles.container}>
                 <View style={styles.switchContainer}>
-                    {myToggle}
+                    {ipToggleSwitch}
+                    {deviceInfoSwitch}
                 </View>
+                <View style={styles.centerContainer}></View>
                 <View style={styles.contentContainer}>
                     <Text style={styles.description}>
                         Search for houses to buy!
@@ -165,11 +199,14 @@ const styles = StyleSheet.create({
     switchContainer: {
         padding: 10,
         marginTop: 0,
-        flexDirection:'row'
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    centerContainer: {
+        flex:1
     },
     contentContainer: {
         padding: 30,
-        marginTop: 20,
         alignItems: 'center'
     },
     container: {

@@ -5,3 +5,12 @@ https://github.com/react-navigation/react-navigation/issues/666
 Toggle switch
 https://www.npmjs.com/package/toggle-switch-react-native
 https://github.com/aminebenkeroum/toggle-switch-react-native/blob/master/example/App.js
+
+IP Address
+https://www.npmjs.com/package/react-native-public-ip
+
+Space Between Toggle Switches
+https://facebook.github.io/react-native/docs/flexbox
+
+Device Info
+https://www.npmjs.com/package/react-native-device-info
